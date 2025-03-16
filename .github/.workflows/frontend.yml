@@ -17,6 +17,12 @@ jobs:
       run: npm install
     - name: Run Tests
       run: npm test -- --coverage
+    - name: Run Snyk to Check for Vulnerabilities
+      uses: snyk/actions/node@master
+      env:
+        SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+      with:
+        args: --severity-threshold=high  # Only fail on high-severity vulnerabilities
     - name: SonarCloud Scan
       uses: SonarSource/sonarcloud-github-action@master
       env:
