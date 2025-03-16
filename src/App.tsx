@@ -165,91 +165,102 @@ const App: React.FC = () => {
     }
   };
 
-  const renderCourseList = () => {
-    if (courses.length === 0) {
-      return (
-        <div className="text-center p-4 text-gray-600">
-          No courses available.
-        </div>
-      );
-    }
-
+const renderCourseList = () => {
+  if (courses.length === 0) {
     return (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {courses.map((course) => (
-          <div key={course.id} className="border rounded-lg shadow p-4 flex flex-col h-full">
-            <h3 className="text-xl font-bold mb-2">{course.title}</h3>
-            <p className="mb-3 flex-grow">{course.description}</p>
-            {user?.role === 'student' && course.teacher_name && (
-              <div className="flex items-center mb-4 text-gray-600">
-                <svg
-                  className="w-5 h-5 mr-2"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                  />
-                </svg>
-                <span className="text-sm">Instructor: {course.teacher_name}</span>
-              </div>
-            )}
-            {user?.role === 'teacher' ? (
-              <div className="mt-auto">
-                <button
-                  onClick={() => handleCourseSelect(course)}
-                  className="w-full bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-                >
-                  Manage Course
-                </button>
-              </div>
-            ) : (
-              <div className="mt-auto space-y-2">
-                <button
-                  onClick={() => handleCourseSelect(course)}
-                  className="w-full bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-                >
-                  View Course
-                </button>
-                {!course.enrolled ? (
-                  <button
-                    onClick={() => setShowConfirmDialog(course.id)}
-                    className="w-full bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
-                    disabled={enrollingCourse}
-                  >
-                    {enrollingCourse && showConfirmDialog === course.id
-                      ? 'Enrolling...'
-                      : 'Enroll'}
-                  </button>
-                ) : (
-                  <div className="w-full text-center py-2 text-green-600 font-medium flex items-center justify-center">
-                    <svg
-                      className="w-5 h-5 mr-1"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M5 13l4 4L19 7"
-                      />
-                    </svg>
-                    Enrolled
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-        ))}
+      <div className="text-center p-4 text-gray-600">
+        No courses available.
       </div>
     );
-  };
+  }
+
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      {courses.map(course => (
+        <div key={course.id} className="border rounded-lg shadow p-4 flex flex-col h-full">
+          {/* Course Header */}
+          <h3 className="text-xl font-bold mb-2">{course.title}</h3>
+          
+          {/* Course Description - Introduce XSS Vulnerability */}
+          <p
+            className="mb-3 flex-grow"
+            dangerouslySetInnerHTML={{ __html: course.description }} // Vulnerable to XSS
+          />
+          
+          {/* Teacher Info */}
+          {user?.role === 'student' && course.teacher_name && (
+            <div className="flex items-center mb-4 text-gray-600">
+              <svg 
+                className="w-5 h-5 mr-2" 
+                fill="none" 
+                stroke="currentColor" 
+                viewBox="0 0 24 24"
+              >
+                <path 
+                  strokeLinecap="round" 
+                  strokeLinejoin="round" 
+                  strokeWidth={2} 
+                  d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" 
+                />
+              </svg>
+              <span className="text-sm">Instructor: {course.teacher_name}</span>
+            </div>
+          )}
+          
+          {/* Action Buttons */}
+          {user?.role === 'teacher' ? (
+            <div className="mt-auto">
+              <button
+                onClick={() => handleCourseSelect(course)}
+                className="w-full bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+              >
+                Manage Course
+              </button>
+            </div>
+          ) : (
+            <div className="mt-auto space-y-2">
+              <button
+                onClick={() => handleCourseSelect(course)}
+                className="w-full bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+              >
+                View Course
+              </button>
+              {!course.enrolled ? (
+                <button
+                  onClick={() => setShowConfirmDialog(course.id)}
+                  className="w-full bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+                  disabled={enrollingCourse}
+                >
+                  {enrollingCourse && showConfirmDialog === course.id 
+                    ? 'Enrolling...' 
+                    : 'Enroll'
+                  }
+                </button>
+              ) : (
+                <div className="w-full text-center py-2 text-green-600 font-medium flex items-center justify-center">
+                  <svg 
+                    className="w-5 h-5 mr-1" 
+                    fill="none" 
+                    stroke="currentColor" 
+                    viewBox="0 0 24 24"
+                  >
+                    <path 
+                      strokeLinecap="round" 
+                      strokeLinejoin="round" 
+                      strokeWidth={2} 
+                      d="M5 13l4 4L19 7" 
+                    />
+                  </svg>
+                  Enrolled
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      ))}
+    </div>
+  );
+};
 
   const renderDashboardContent = () => {
     if (selectedCourse) {
